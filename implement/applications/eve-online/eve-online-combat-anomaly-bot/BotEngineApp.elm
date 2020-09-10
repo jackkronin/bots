@@ -1,4 +1,4 @@
-{- EVE Online combat anomaly bot version 2020-08-28
+{- EVE Online combat anomaly bot version Dante 2020-09-10
    This bot uses the probe scanner to warp to combat anomalies and kills rats using drones and weapon modules.
 
    Setup instructions for the EVE Online client:
@@ -76,7 +76,6 @@ import EveOnline.AppFramework
 import EveOnline.ParseUserInterface
     exposing
         ( OverviewWindowEntry
-        , ShipUI
         , ShipUIModuleButton
         )
 import Set
@@ -520,11 +519,6 @@ combat context seeUndockingComplete continueIfCombatComplete =
             else
                 context.readingFromGameClient.targets |> List.filter .isActiveTarget
 
-        ensureShipIsOrbitingDecision =
-            overviewEntriesToAttack
-                |> List.head
-                |> Maybe.andThen (\overviewEntryToAttack -> ensureShipIsOrbiting seeUndockingComplete.shipUI overviewEntryToAttack)
-
         decisionIfAlreadyOrbiting =
             case targetsToUnlock |> List.head of
                 Just targetToUnlock ->
@@ -589,7 +583,7 @@ combat context seeUndockingComplete continueIfCombatComplete =
                                             )
                                 )
     in
-    ensureShipIsOrbitingDecision |> Maybe.withDefault decisionIfAlreadyOrbiting
+    decisionIfAlreadyOrbiting
 
 
 enterAnomaly : { ifNoAcceptableAnomalyAvailable : DecisionPathNode } -> BotDecisionContext -> DecisionPathNode
@@ -631,26 +625,6 @@ enterAnomaly { ifNoAcceptableAnomalyAvailable } context =
                                 (useMenuEntryWithTextContaining "Within 0 m" menuCascadeCompleted)
                             )
                         )
-
-
-ensureShipIsOrbiting : ShipUI -> OverviewWindowEntry -> Maybe DecisionPathNode
-ensureShipIsOrbiting shipUI overviewEntryToOrbit =
-    if (shipUI.indication |> Maybe.andThen .maneuverType) == Just EveOnline.ParseUserInterface.ManeuverOrbit then
-        Nothing
-
-    else
-        Just
-            (endDecisionPath
-                (actWithoutFurtherReadings
-                    ( "Press the 'W' key and click on the overview entry."
-                    , [ [ EffectOnWindow.KeyDown EffectOnWindow.vkey_W ]
-                      , overviewEntryToOrbit.uiNode |> clickOnUIElement MouseButtonLeft
-                      , [ EffectOnWindow.KeyUp EffectOnWindow.vkey_W ]
-                      ]
-                        |> List.concat
-                    )
-                )
-            )
 
 
 launchAndEngageDrones : ReadingFromGameClient -> Maybe DecisionPathNode
