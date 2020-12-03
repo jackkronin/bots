@@ -626,7 +626,7 @@ enterAnomaly { ifNoAcceptableAnomalyAvailable } context =
                         (useContextMenuCascade
                             ( "Scan result", anomalyScanResult.uiNode )
                             (useMenuEntryWithTextContaining "Warp to Within"
-                                (useMenuEntryWithTextContaining "Within 0 m" menuCascadeCompleted)
+                                (useMenuEntryWithTextContaining "Within 100 m" menuCascadeCompleted)
                             )
                             context.readingFromGameClient
                         )
